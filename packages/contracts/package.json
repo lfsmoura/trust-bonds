@@ -1,0 +1,16 @@
+{
+  "name": "@trust-bonds/contracts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "forge build",
+    "test": "forge test",
+    "coverage": "forge coverage",
+    "lint": "forge fmt && forge check",
+    "clean": "rm -rf out"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
