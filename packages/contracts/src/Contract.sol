@@ -2,6 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "eas-proxy/IGitcoinPassportDecoder.sol";
+import "aave-v3-core/interfaces/IPool.sol";
 
 interface ITrustBond {
     event FeeUpdated(uint256 newFee);
@@ -44,10 +45,12 @@ contract TrustBond is ITrustBond {
     bool public _paused;
     uint256 public _fee;
     IGitcoinPassportDecoder public _passportDecoder;
+    IPool public _pool;
 
-    constructor(address owner, IGitcoinPassportDecoder passportDecoder) {
+    constructor(address owner, IGitcoinPassportDecoder passportDecoder, IPool pool) {
         _owner = owner;
         _passportDecoder = passportDecoder;
+        _pool = pool;
     }
 
     modifier onlyOwner() {
@@ -96,6 +99,8 @@ contract TrustBond is ITrustBond {
         require(msg.sender != partner, "Cannot bond with yourself");
         require(_passportDecoder.getScore(msg.sender) >= REQUIRED_SCORE, "Score must be greater");
         require(_passportDecoder.getScore(partner) >= REQUIRED_SCORE, "Score must be greater");
+
+        _pool.supply(address(this), amount, msg.sender, 0);
     }
     
     function withdraw(address partner) external onlyWhenNotPaused {
