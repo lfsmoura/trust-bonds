@@ -2,7 +2,18 @@
 pragma solidity ^0.8.13;
 
 import "eas-proxy/IGitcoinPassportDecoder.sol";
-import "aave-v3-core/interfaces/IPool.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+interface IPool {
+    function supply(address asset, uint256 amount, address onBehalfOf, uint16 referralCode) external;
+}
+
+struct Bond {
+    address partner;
+    uint256 amount;
+    uint256 createdAt;
+    uint256 lastUpdated;
+}
 
 interface ITrustBond {
     event FeeUpdated(uint256 newFee);
@@ -32,7 +43,7 @@ interface ITrustBond {
 
     function fee() external view returns (uint256);
     function communityPoolBalance() external view returns (uint256);
-    function bond(address partner1, address partner2) external view returns (uint256 amount, uint256 createdAt, uint256 lastUpdated);
+    function bond(address partner1, address partner2) external view returns (Bond memory);
     function bonds(address user) external view returns (address[] memory);
     function personMultiplier(address user) external view returns (uint256);
     function score(address user) external view returns (uint256);
@@ -44,13 +55,21 @@ contract TrustBond is ITrustBond {
     address public _owner;
     bool public _paused;
     uint256 public _fee;
-    IGitcoinPassportDecoder public _passportDecoder;
-    IPool public _pool;
 
-    constructor(address owner, IGitcoinPassportDecoder passportDecoder, IPool pool) {
+    IGitcoinPassportDecoder public _passportDecoder;
+
+    // TODO: there's also L2Pool, should we use that?
+    IPool public _pool;
+    IERC20 public _token;
+
+    // TODO: inefficient, but it's fine for now
+    mapping(address => Bond[]) public _bonds;
+
+    constructor(address owner, IGitcoinPassportDecoder passportDecoder, IPool pool, IERC20 token) {
         _owner = owner;
         _passportDecoder = passportDecoder;
         _pool = pool;
+        _token = token;
     }
 
     modifier onlyOwner() {
@@ -96,11 +115,22 @@ contract TrustBond is ITrustBond {
 
     function deposit(uint256 amount, address partner) external onlyWhenNotPaused {
         require(amount > 0, "Amount must be greater than 0");
+        require (_token.balanceOf(msg.sender) >= amount, "Insufficient balance");
         require(msg.sender != partner, "Cannot bond with yourself");
         require(_passportDecoder.getScore(msg.sender) >= REQUIRED_SCORE, "Score must be greater");
         require(_passportDecoder.getScore(partner) >= REQUIRED_SCORE, "Score must be greater");
 
-        _pool.supply(address(this), amount, msg.sender, 0);
+        // TODO: what is a referral code?
+        // TODO: I am assuming a single deposit for each bond
+        _pool.supply(address(_token), amount, address(this), 0);
+
+        Bond memory createdBond = bond(msg.sender, partner);
+        if (createdBond.partner == address(0)) {
+            _bonds[msg.sender].push(Bond(partner, amount, block.timestamp, block.timestamp));
+        } else {
+            createdBond.amount += amount;
+            createdBond.lastUpdated = block.timestamp;
+        }
     }
     
     function withdraw(address partner) external onlyWhenNotPaused {
@@ -135,7 +165,12 @@ contract TrustBond is ITrustBond {
 
     }
 
-    function bond(address partner1, address partner2) external view returns (uint256 amount, uint256 createdAt, uint256 lastUpdated) {
-
+    function bond(address partner1, address partner2) public view returns (Bond memory) {
+        for (uint256 i = 0; i < _bonds[partner1].length; i++) {
+            if (_bonds[partner1][i].partner == partner2) {
+                return _bonds[partner1][i];
+            }
+        }
+        return Bond(address(0), 0, 0, 0);
     }
 }

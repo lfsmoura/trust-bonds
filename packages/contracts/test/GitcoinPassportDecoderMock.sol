@@ -10,7 +10,7 @@ contract GitcoinPassportDecoderMock is IGitcoinPassportDecoder {
         scores[user] = score;
     }
 
-    function getPassport(address user) external pure returns (Credential[] memory) {
+    function getPassport(address) external pure returns (Credential[] memory) {
         Credential[] memory credentials = new Credential[](0);
         return credentials;
     }
