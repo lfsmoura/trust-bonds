@@ -4,3 +4,6 @@
 [submodule "packages/contracts/lib/eas-proxy"]
 	path = packages/contracts/lib/eas-proxy
 	url = https://github.com/passportxyz/eas-proxy
+[submodule "packages/contracts/lib/aave-v3-core"]
+	path = packages/contracts/lib/aave-v3-core
+	url = https://github.com/aave/aave-v3-core
