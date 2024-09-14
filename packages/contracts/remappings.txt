@@ -1,0 +1,2 @@
+eas-proxy/=lib/eas-proxy/contracts/
+forge-std/=lib/forge-std/src/
