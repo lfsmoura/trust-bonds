@@ -6,6 +6,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 interface IPool {
     function supply(address asset, uint256 amount, address onBehalfOf, uint16 referralCode) external;
+    function withdraw(address asset, uint256 amount, address to) external returns (uint256);
+    function supplyWithPermit(address asset, uint256 amount, address onBehalfOf, uint16 referralCode, uint256 deadline, uint8 permitV, bytes32 permitR, bytes32 permitS) external;
 }
 
 struct Bond {
@@ -44,7 +46,7 @@ interface ITrustBond {
     function fee() external view returns (uint256);
     function communityPoolBalance() external view returns (uint256);
     function bond(address partner1, address partner2) external view returns (Bond memory);
-    function bonds(address user) external view returns (address[] memory);
+    function bonds(address user) external view returns (Bond[] memory);
     function personMultiplier(address user) external view returns (uint256);
     function score(address user) external view returns (uint256);
 }
@@ -116,12 +118,18 @@ contract TrustBond is ITrustBond {
     function deposit(uint256 amount, address partner) external onlyWhenNotPaused {
         require(amount > 0, "Amount must be greater than 0");
         require (_token.balanceOf(msg.sender) >= amount, "Insufficient balance");
+        require(_token.allowance(msg.sender, address(this)) >= amount, "Insufficient allowance");
         require(msg.sender != partner, "Cannot bond with yourself");
         require(_passportDecoder.getScore(msg.sender) >= REQUIRED_SCORE, "Score must be greater");
         require(_passportDecoder.getScore(partner) >= REQUIRED_SCORE, "Score must be greater");
 
-        // TODO: what is a referral code?
-        // TODO: I am assuming a single deposit for each bond
+        // TODO use supplyWithPermit instead of transferFrom
+        _token.transferFrom(msg.sender, address(this), amount);
+
+        // TODO: what is a referral code?   
+        // aTokens will be held by contract?
+        require(_token.balanceOf(address(this)) >= amount, "Insufficient balance");
+        _token.approve(address(_pool), amount);
         _pool.supply(address(_token), amount, address(this), 0);
 
         Bond memory createdBond = bond(msg.sender, partner);
@@ -138,7 +146,16 @@ contract TrustBond is ITrustBond {
     }
 
     function breakBond(address partner) external onlyWhenNotPaused {
+        Bond memory bond1 = bond(msg.sender, partner);
+        Bond memory bond2 = bond(partner, msg.sender);
+        require(bond1.amount + bond2.amount > 0, "No bond to break");
 
+        uint256 amount = _pool.withdraw(address(_token), bond1.amount + bond2.amount, address(this));
+        require(amount == bond1.amount + bond2.amount, "Withdrawal amount mismatch");
+
+        // discount fee
+        uint256 feeAmount = (amount * _fee) / 100;
+        _token.transfer(msg.sender, amount - feeAmount);
     }
 
     function approve(address partner, address spender) external onlyWhenNotPaused {
@@ -153,8 +170,8 @@ contract TrustBond is ITrustBond {
         
     }
 
-    function bonds(address user) external view returns (address[] memory) {
-
+    function bonds(address user) external view returns (Bond[] memory) {
+        return _bonds[user];
     }
 
     function personMultiplier(address user) external view returns (uint256) {
