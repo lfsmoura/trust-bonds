@@ -231,7 +231,9 @@ contract TrustBond is ITrustBond {
         return _fee;
     }
 
-    function communityPoolBalance() external view returns (uint256) {}
+    function communityPoolBalance() external view returns (uint256) {
+        return _token.balanceOf(address(this));
+    }
 
     function bonds(address user) external view returns (Bond[] memory) {
         return _bonds[user];

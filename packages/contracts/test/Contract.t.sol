@@ -96,6 +96,40 @@ contract TestContract is Test {
         // Retrieve the bond between the two users
         Bond memory bond = c.bond(user1, user2);
         assertEq(bond.partner, user2);
+        // Retrieve the balance of the community pool before breaking the bond
+        uint256 communityBalanceBeforeBreaking = c.communityPoolBalance();
+        // Retrieve user Balance Before Breaking the Bond
+        uint256 user1BalanceBeforeBreaking = token.balanceOf(user1);
+        // Retrieve the fee for breaking a bond
+        uint256 bondBreakFee = c.fee();
+        // Simulate the first user making the call
+        vm.prank(user1);
+        // Break the bond between the two users
+        c.breakBond(user2);
+        // Retrieve user1's balance
+        uint256 user1BalanceAfterBreaking = token.balanceOf(user1);
+        // Check for user1's balance after breaking the bond
+        assertEq(
+            user1BalanceAfterBreaking,
+            user1BalanceBeforeBreaking + 200 - (bondBreakFee * 100)
+        );
+        // Retrieve the balance of the community pool after breaking the bond
+        assertEq(
+            c.communityPoolBalance(),
+            communityBalanceBeforeBreaking + (bondBreakFee * 100)
+        );
+        // TO-DO: Define community pool balance: does it include user funds?
+    }
+
+    function testBreakABondTwice() public {
+        // Generate two user addresses
+        address user1 = getUser();
+        address user2 = getUser();
+        // Create a bond between the two users
+        createValidBond(user1, 100, user2, 100);
+        // Retrieve the bond between the two users
+        Bond memory bond = c.bond(user1, user2);
+        assertEq(bond.partner, user2);
         // Simulate the first user making the call
         vm.prank(user1);
         // Break the bond between the two users
