@@ -32,8 +32,11 @@ contract TestContract is Test {
         // Generate a new user address
         address user = getUser();
         // Transfer 100 tokens to the user
-        token.transfer(user, 100);
+        token.transfer(user, 100);        
+        vm.prank(user);
+        token.approve(address(c), 100);
         // Expect the next call to revert because the user doesn't have a passport score
+        vm.prank(user);
         vm.expectRevert();
         // Attempt to deposit 100 tokens for a new user without a passport score
         c.deposit(100, getUser());
@@ -44,6 +47,8 @@ contract TestContract is Test {
         address user = getUser();
         // Transfer 100 tokens to the user
         token.transfer(user, 100);
+        vm.prank(user);
+        token.approve(address(c), 100);
         // Set the user's passport score to 100
         passportDecoder.setScore(user, 100);
         // Expect the next call to revert because the recipient doesn't have a passport score
