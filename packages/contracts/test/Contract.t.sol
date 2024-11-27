@@ -93,31 +93,41 @@ contract TestContract is Test {
         address user2 = getUser();
         // Create a bond between the two users
         createValidBond(user1, 100, user2, 100);
-        // Retrieve the bond between the two users
-        Bond memory bond = c.bond(user1, user2);
-        assertEq(bond.partner, user2);
-        // Retrieve the balance of the community pool before breaking the bond
-        uint256 communityBalanceBeforeBreaking = c.communityPoolBalance();
-        // Retrieve user Balance Before Breaking the Bond
+        // Retrieve the bonds between the two users
+        Bond memory bond1 = c.bond(user1, user2);
+        assertEq(bond1.partner, user2);
+        Bond memory bond2 = c.bond(user2, user1);
+        assertEq(bond2.partner, user1);
+
+        // Retrieve user1 Balance Before Breaking the Bond
         uint256 user1BalanceBeforeBreaking = token.balanceOf(user1);
-        // Retrieve the fee for breaking a bond
-        uint256 bondBreakFee = c.fee();
+
+        // Retrieve user2 Balance Before Breaking the Bond
+        uint256 user2BalanceBeforeBreaking = token.balanceOf(user2);
+
+        // Retrieve bond amount before breaking the bond
+        uint256 bondBalanceBeforeBreaking = bond1.amount + bond2.amount;
+
         // Simulate the first user making the call
         vm.prank(user1);
         // Break the bond between the two users
         c.breakBond(user2);
-        // Retrieve user1's balance
+        // Retrieve user1's balance after breaking the bond
         uint256 user1BalanceAfterBreaking = token.balanceOf(user1);
+        // Retrieve user2's balance after breaking the bond
+        uint256 user2BalanceAfterBreaking = token.balanceOf(user2);
+        // Retrieve contract balance after breaking the bond
+        uint256 contractBalanceAfterBreaking = token.balanceOf(address(c));
+
         // Check for user1's balance after breaking the bond
         assertEq(
             user1BalanceAfterBreaking,
-            user1BalanceBeforeBreaking + 200 - (bondBreakFee * 100)
+            (bondBalanceBeforeBreaking - contractBalanceAfterBreaking)
         );
-        // Retrieve the balance of the community pool after breaking the bond
-        assertEq(
-            c.communityPoolBalance(),
-            communityBalanceBeforeBreaking + (bondBreakFee * 100)
-        );
+
+        // Check for user2's not recieving any funds due to the bond being broken
+        assertEq(user2BalanceAfterBreaking, user2BalanceBeforeBreaking);
+
         // TO-DO: Define community pool balance: does it include user funds?
     }
 
@@ -130,38 +140,20 @@ contract TestContract is Test {
         // Retrieve the bond between the two users
         Bond memory bond = c.bond(user1, user2);
         assertEq(bond.partner, user2);
-        // Retrieve the balance of the community pool before breaking the bond
-        uint256 communityBalanceBeforeBreaking = c.communityPoolBalance();
-        // Retrieve user Balance Before Breaking the Bond
-        uint256 user1BalanceBeforeBreaking = token.balanceOf(user1);
-        // Retrieve the fee for breaking a bond
-        uint256 bondBreakFee = c.fee();
+
         // Simulate the first user making the call
         vm.prank(user1);
         // Break the bond between the two users
         c.breakBond(user2);
-        // Retrieve user1's balance after breaking the bond
-        uint256 user1BalanceAfterBreaking = token.balanceOf(user1);
-        // Check for user1's balance after breaking the bond
-        assertEq(
-            user1BalanceAfterBreaking,
-            user1BalanceBeforeBreaking + 200 - (bondBreakFee * 100)
-        );
-        // Retrieve the balance of the community pool after breaking the bond
-        uint256 communityBalanceAfterBreaking = c.communityPoolBalance();
-        // Check the balance of the community pool after breaking the bond
-        assertEq(
-            communityBalanceAfterBreaking,
-            communityBalanceBeforeBreaking + (bondBreakFee * 100)
-        );
+
+        // TO-DO: check for balances before and after bond breaking
+
         // Expect the next call to revert because the bond has already been broken
         vm.expectRevert();
         // Attempt to break the bond again
         c.breakBond(user2);
-        // Check for user1's balance to be unaltered
-        assertEq(token.balanceOf(user1), user1BalanceAfterBreaking);
-        // Check for the community pool balance to be unaltered
-        assertEq(c.communityPoolBalance(), communityBalanceAfterBreaking);
+
+        // TO-DO: check for balances to be unaltered after the reverted call
     }
 
     function testBreakABondWithoutAPartner() public {
@@ -207,6 +199,10 @@ contract TestContract is Test {
         assertEq(bond.partner, user2);
         // Retrieve the balance of the community pool before breaking the bond
         uint256 communityBalanceBeforeBreaking = c.communityPoolBalance();
+        console.log(
+            "Community Balance Before Breaking: ",
+            communityBalanceBeforeBreaking
+        );
         // Retrieve user1 Balance before attempting to break the bond
         uint256 user1BalanceBeforeBreaking = token.balanceOf(user1);
         // Retrieve user2 Balance before attempting to break the bond

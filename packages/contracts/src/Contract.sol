@@ -120,6 +120,7 @@ contract TrustBond is ITrustBond {
         _passportDecoder = passportDecoder;
         _pool = pool;
         _token = token;
+        _fee = 1; // TODO: define fee under break/withdrawal functions or define different fees for each?
     }
 
     modifier onlyOwner() {
