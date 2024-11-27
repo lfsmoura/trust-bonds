@@ -201,7 +201,41 @@ contract TrustBond is ITrustBond {
         }
     }
 
-    function withdraw(address partner) external onlyWhenNotPaused {}
+    function withdraw(address partner) external onlyWhenNotPaused {
+        // TODO: what if partner
+
+        // Retrieve bond for msg.sender
+        Bond memory bond1 = bond(msg.sender, partner);
+        require(bond1.amount > 0, "No funds to withdraw");
+
+        // Retrieve bond for partner
+        Bond memory bond2 = bond(partner, msg.sender);
+        require(bond2.amount > 0, "No funds to withdraw");
+
+        // Send funds to msg.sender
+        uint256 amount1 = _pool.withdraw(
+            address(_token),
+            bond1.amount - (bond1.amount * _fee) / 100,
+            msg.sender
+        );
+
+        require(
+            amount1 == bond1.amount - (bond1.amount * _fee) / 100,
+            "Withdrawal amount mismatch"
+        );
+
+        // Send funds to partner
+        uint256 amount2 = _pool.withdraw(
+            address(_token),
+            bond2.amount - (bond2.amount * _fee) / 100,
+            partner
+        );
+
+        require(
+            amount2 == bond2.amount - (bond2.amount * _fee) / 100,
+            "Withdrawal amount mismatch"
+        );
+    }
 
     function breakBond(address partner) external onlyWhenNotPaused {
         Bond memory bond1 = bond(msg.sender, partner);

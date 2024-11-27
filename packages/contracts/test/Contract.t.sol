@@ -100,7 +100,7 @@ contract TestContract is Test {
         assertEq(bond2.partner, user1);
 
         // Retrieve user1 Balance Before Breaking the Bond
-        uint256 user1BalanceBeforeBreaking = token.balanceOf(user1);
+        // uint256 user1BalanceBeforeBreaking = token.balanceOf(user1);
 
         // Retrieve user2 Balance Before Breaking the Bond
         uint256 user2BalanceBeforeBreaking = token.balanceOf(user2);
@@ -223,6 +223,72 @@ contract TestContract is Test {
         assertEq(c.communityPoolBalance(), communityBalanceBeforeBreaking);
         // Check for user3's balance to be unaltered
         assertEq(token.balanceOf(user3), user3BalanceBeforeBreaking);
+    }
+
+    function testWithdraw() public {
+        // Generate two user addresses
+        address user1 = getUser();
+        address user2 = getUser();
+        // Create a bond between the two users
+        createValidBond(user1, 100, user2, 100);
+        // Retrieve the bonds between the users
+        Bond memory bond1 = c.bond(user1, user2);
+        Bond memory bond2 = c.bond(user2, user1);
+        // Assert the existence of the bonds
+        assertEq(bond1.partner, user2);
+        assertEq(bond2.partner, user1);
+        // Retrieve contract fee
+        uint256 fee = c.fee();
+        // Retrieve the balance of User1 before withdrawing
+        uint256 user1BalanceBeforeWithdraw = token.balanceOf(user1);
+        console.log(
+            "User1 Balance Before Withdraw: ",
+            user1BalanceBeforeWithdraw
+        );
+        // Retrieve the balance of User2 before withdrawing
+        uint256 user2BalanceBeforeWithdraw = token.balanceOf(user2);
+        console.log(
+            "User2 Balance Before Withdraw: ",
+            user2BalanceBeforeWithdraw
+        );
+        // Retrieve bond amount before withdrawing
+        uint256 bondBalanceBeforeWithdraw = bond1.amount + bond2.amount;
+        console.log(
+            "Bond Balance Before Withdraw: ",
+            bondBalanceBeforeWithdraw
+        );
+        uint256 contractBalanceBeforeWithdraw = token.balanceOf(address(c));
+        console.log(
+            "Contract Balance Before Withdraw: ",
+            contractBalanceBeforeWithdraw
+        );
+        // Simulate the first user making the call
+        vm.prank(user1);
+        // Withdraw
+        c.withdraw(user2);
+        // Retrieve the balance of User1 after withdrawing
+        uint256 user1BalanceAfterWithdraw = token.balanceOf(user1);
+        assertEq(
+            user1BalanceAfterWithdraw,
+            bond1.amount - (bond1.amount * fee) / 100
+        );
+        // Retrieve the balance of User2 after withdrawing
+        uint256 user2BalanceAfterWithdraw = token.balanceOf(user2);
+        assertEq(
+            user2BalanceAfterWithdraw,
+            bond2.amount - (bond2.amount * fee) / 100
+        );
+        // Retrieve the contract balance after withdrawing
+        uint256 contractBalanceAfterWithdraw = token.balanceOf(address(c));
+        console.log(
+            "Contract Balance After Withdraw: ",
+            contractBalanceAfterWithdraw
+        );
+        // Check for the balance of fees after withdrawing
+        //assertEq(
+        //    contractBalanceAfterWithdraw,
+        //    bondBalanceBeforeWithdraw - contractBalanceAfterWithdraw
+        //);
     }
 
     // ------------------------------------------------------------------------
