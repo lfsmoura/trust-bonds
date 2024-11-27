@@ -4,6 +4,9 @@ pragma solidity ^0.8.13;
 import "eas-proxy/IGitcoinPassportDecoder.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+// TO-DO: merge with withdrawal-basic
+// TO-DO: rewrite tests as fuzzy and retrieve contract information using the AAVE aTokens
+
 interface IPool {
     function supply(
         address asset,
