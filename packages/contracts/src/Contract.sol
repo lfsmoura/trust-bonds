@@ -106,6 +106,7 @@ contract TrustBond is ITrustBond {
     // TODO: there's also L2Pool, should we use that?
     IPool public _pool;
     IERC20 public _token;
+    IERC20 public _atoken;
 
     // TODO: inefficient, but it's fine for now
     mapping(address => Bond[]) public _bonds;
@@ -114,13 +115,15 @@ contract TrustBond is ITrustBond {
         address owner,
         IGitcoinPassportDecoder passportDecoder,
         IPool pool,
-        IERC20 token
+        IERC20 token,
+        IERC20 atoken
     ) {
         _owner = owner;
         _passportDecoder = passportDecoder;
         _pool = pool;
         _token = token;
-        _fee = 1; // TODO: define fee under break/withdrawal functions or define different fees for each?
+        _fee = 1; // TODO: define different fees for different actions (breakFee, withdrawalFee, etc)
+        _atoken = atoken;
     }
 
     modifier onlyOwner() {
@@ -202,9 +205,7 @@ contract TrustBond is ITrustBond {
     }
 
     function withdraw(address partner) external onlyWhenNotPaused {
-        // TODO: what if partner
-
-        // Retrieve bond for msg.sender
+        // Retrieve bond for caller
         Bond memory bond1 = bond(msg.sender, partner);
         require(bond1.amount > 0, "No funds to withdraw");
 
@@ -212,29 +213,32 @@ contract TrustBond is ITrustBond {
         Bond memory bond2 = bond(partner, msg.sender);
         require(bond2.amount > 0, "No funds to withdraw");
 
-        // Send funds to msg.sender
+        // Define amount for caller
         uint256 amount1 = _pool.withdraw(
             address(_token),
-            bond1.amount - (bond1.amount * _fee) / 100,
-            msg.sender
+            bond1.amount,
+            address(this)
         );
 
-        require(
-            amount1 == bond1.amount - (bond1.amount * _fee) / 100,
-            "Withdrawal amount mismatch"
-        );
+        require(amount1 == bond1.amount, "Withdrawal amount mismatch");
 
-        // Send funds to partner
+        // apply fee
+        amount1 -= (amount1 * _fee) / 100;
+
+        //send
+        _token.transfer(msg.sender, amount1);
+
         uint256 amount2 = _pool.withdraw(
             address(_token),
-            bond2.amount - (bond2.amount * _fee) / 100,
-            partner
+            bond2.amount,
+            address(this)
         );
 
-        require(
-            amount2 == bond2.amount - (bond2.amount * _fee) / 100,
-            "Withdrawal amount mismatch"
-        );
+        require(amount2 == bond2.amount, "Withdrawal amount mismatch");
+
+        amount2 -= (amount2 * _fee) / 100;
+
+        _token.transfer(partner, amount2);
     }
 
     function breakBond(address partner) external onlyWhenNotPaused {
