@@ -8,14 +8,15 @@ import "../test/ERC20Mock.sol";
 import "../test/AavePoolMock.sol";
 
 contract DeployTestnet is Script {
-    function run(
-        address passportDecoderAddress,
-        address tokenAddress,
-        address poolAddress,
-        address trustBondOwner
-    ) external {
+    function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
+
+        // Load addresses from environment variables
+        address passportDecoderAddress = vm.envAddress("TESTNET_PASSPORT_DECODER");
+        address tokenAddress = vm.envAddress("TESTNET_TOKEN"); 
+        address poolAddress = vm.envAddress("TESTNET_POOL");
+        address trustBondOwner = vm.envAddress("TESTNET_OWNER");
 
         // Use provided addresses for dependencies
         IGitcoinPassportDecoder passportDecoder = IGitcoinPassportDecoder(passportDecoderAddress);

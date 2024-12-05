@@ -17,6 +17,12 @@
     },
     "clean": {
       "cache": false
+    },
+    "snapshot": {
+      "dependsOn": ["^build"]
+    },
+    "snapshot-check": {
+      "dependsOn": ["^build"]
     }
   }
 }
