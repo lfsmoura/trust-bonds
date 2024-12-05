@@ -247,7 +247,7 @@ contract TestContract is Test {
         assertEq(bond1.partner, user2);
         assertEq(bond2.partner, user1);
         // Retrieve contract fee
-        uint256 fee = c.fee();
+        uint256 fee = c.withdrawalFee();
         // Retrieve the balance for message sender (user1) before withdrawing
         uint256 amount1 = bond1.amount;
         // Retrieve the balance for partner (user2) before withdrawing
@@ -260,10 +260,10 @@ contract TestContract is Test {
         c.withdraw(user2);
         // Retrieve the balance of User1 after withdrawing
         uint256 user1BalanceAfterWithdraw = token.balanceOf(user1);
-        assertEq(user1BalanceAfterWithdraw, amount1 - (amount1 * fee) / 100);
+        assertEq(user1BalanceAfterWithdraw, (amount1 - (amount1 * fee) / 100));
         // Retrieve the balance of User2 after withdrawing
         uint256 user2BalanceAfterWithdraw = token.balanceOf(user2);
-        assertEq(user2BalanceAfterWithdraw, amount2 - (amount2 * fee) / 100);
+        assertEq(user2BalanceAfterWithdraw, (amount2 - (amount2 * fee) / 100));
         // Retrieve the contract balance after withdrawing
         uint256 contractBalanceAfterWithdraw = atoken.balanceOf(address(c));
 
