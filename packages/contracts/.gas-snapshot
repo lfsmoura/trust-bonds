@@ -1,1 +1,7 @@
-TestContract:testBar() (gas: 401)
+TestContract:testBreakABond() (gas: 550088)
+TestContract:testBreakABondTwice() (gas: 547766)
+TestContract:testBreakABondWithoutAPartner() (gas: 495585)
+TestContract:testCanCreateBondWithUserWithPassport() (gas: 308146)
+TestContract:testCantCreateBondWithUserWithoutPassport() (gas: 133441)
+TestContract:testCantCreateBondWithoutPassport() (gas: 107355)
+TestContract:testFindABond() (gas: 493856)

@@ -2,7 +2,7 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 
 env:
@@ -27,10 +27,11 @@ jobs:
       - name: Install deps
         run: |
           pnpm install
+          cd packages/contracts
           forge install
 
       - name: Check gas snapshots
-        run: forge snapshot --check
+        run: pnpm snapshot-check
 
       - name: Run tests
         run: pnpm test

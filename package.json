@@ -7,7 +7,9 @@
     "test": "turbo test",
     "type-check": "turbo type-check",
     "clean": "turbo clean",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "snapshot": "turbo snapshot",
+    "snapshot-check": "turbo snapshot-check"
   },
   "devDependencies": {
     "prettier": "^3.2.5",
