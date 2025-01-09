@@ -8,6 +8,9 @@
     "test": "forge test",
     "coverage": "forge coverage",
     "lint": "forge fmt && forge check",
+    "snapshot-check": "forge snapshot --check --tolerance 10",
+    "snapshot": "forge snapshot",
+    "deploy-testnet": "forge script scripts/deployTestnet.s.sol:DeployTestnet --rpc-url $RPC_URL --broadcast --verify --etherscan-api-key $ETHERSCAN_API_KEY --verifier-url $VERIFIER_URL",
     "clean": "rm -rf out"
   },
   "keywords": [],
