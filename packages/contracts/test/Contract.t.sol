@@ -35,7 +35,7 @@ contract TestContract is Test {
         // Generate a new user address
         address user = getUser();
         // Transfer 100 tokens to the user
-        token.transfer(user, 100);        
+        token.transfer(user, 100);
         vm.prank(user);
         token.approve(address(c), 100);
         // Expect the next call to revert because the user doesn't have a passport score
