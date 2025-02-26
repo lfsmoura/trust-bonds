@@ -339,6 +339,69 @@ contract TestContract is Test {
         );
     }
 
+    function testFuzz_Deposit(uint256 _amount) public {
+        // Bound the fuzz input to reasonable values (1 to 1000000000)
+        vm.assume(_amount > 0 && _amount <= 1000000000);
+
+        // Generate two user addresses
+        address user1 = getUser();
+        address user2 = getUser();
+
+        // Set up passport scores for both users
+        passportDecoder.setScore(user1, 30);
+        passportDecoder.setScore(user2, 30);
+
+        // Transfer tokens to user1
+        token.transfer(user1, _amount);
+
+        // Get initial balances
+        uint256 user1BalanceBeforeDeposit = token.balanceOf(user1);
+        uint256 contractBalanceBeforeDeposit = atoken.balanceOf(address(c));
+
+        // Approve tokens for the contract
+        vm.prank(user1);
+        token.approve(address(c), _amount);
+
+        // Perform deposit
+        vm.prank(user1);
+        c.deposit(_amount, user2);
+
+        // Get the bond details
+        Bond memory createdBond = c.bond(user1, user2);
+
+        // Assertions
+        assertEq(createdBond.partner, user2, "Bond partner should be user2");
+        assertEq(
+            createdBond.amount,
+            _amount,
+            "Bond amount should match deposit"
+        );
+        assertEq(
+            createdBond.createdAt,
+            block.timestamp,
+            "Creation timestamp should be current block"
+        );
+        assertEq(
+            createdBond.lastUpdated,
+            block.timestamp,
+            "Last updated should be current block"
+        );
+
+        // Check user1's balance has decreased
+        assertEq(
+            token.balanceOf(user1),
+            user1BalanceBeforeDeposit - _amount,
+            "User balance should be reduced by deposit amount"
+        );
+
+        // Check contract's aToken balance has increased
+        assertEq(
+            atoken.balanceOf(address(c)),
+            contractBalanceBeforeDeposit + _amount,
+            "Contract should hold aTokens"
+        );
+    }
+
     // ------------------------------------------------------------------------
     // helper functions
     // ------------------------------------------------------------------------
