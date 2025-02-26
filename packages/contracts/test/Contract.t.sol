@@ -96,16 +96,17 @@ contract TestContract is Test {
     }
 
     function testFuzz_BreakABond(
-        uint256 user1Amount,
-        uint256 user2Amount
+        uint256 _user1Amount,
+        uint256 _user2Amount
     ) public {
-        user1Amount = (user1Amount % 1000000000) + 1;
-        user2Amount = (user2Amount % 1000000000) + 1;
+        // Bound the fuzz inputs to reasonable values (1 to 1000000000)
+        vm.assume(_user1Amount > 0 && _user1Amount <= 1000000000);
+        vm.assume(_user2Amount > 0 && _user2Amount <= 1000000000);
         // Generate two user addresses
         address user1 = getUser();
         address user2 = getUser();
         // Create a bond between the two users
-        createValidBond(user1, user1Amount, user2, user2Amount);
+        createValidBond(user1, _user1Amount, user2, _user2Amount);
         // Retrieve the bonds between the two users
         Bond memory bond1 = c.bond(user1, user2);
         assertEq(bond1.partner, user2);
@@ -152,16 +153,17 @@ contract TestContract is Test {
     }
 
     function testFuzz_BreakABondTwice(
-        uint256 user1Amount,
-        uint256 user2Amount
+        uint256 _user1Amount,
+        uint256 _user2Amount
     ) public {
-        user1Amount = (user1Amount % 1000000000) + 1;
-        user2Amount = (user2Amount % 1000000000) + 1;
+        // Bound the fuzz inputs to reasonable values (1 to 1000000000)
+        vm.assume(_user1Amount > 0 && _user1Amount <= 1000000000);
+        vm.assume(_user2Amount > 0 && _user2Amount <= 1000000000);
         // Generate two user addresses
         address user1 = getUser();
         address user2 = getUser();
         // Create a bond between the two users
-        createValidBond(user1, user1Amount, user2, user2Amount);
+        createValidBond(user1, _user1Amount, user2, _user2Amount);
         // Retrieve the bond between the two users
         Bond memory bond1 = c.bond(user1, user2);
         Bond memory bond2 = c.bond(user2, user1);
@@ -212,16 +214,17 @@ contract TestContract is Test {
     }
 
     function testFuzz_BreakABondWithoutAPartner(
-        uint256 user1Amount,
-        uint256 user2Amount
+        uint256 _user1Amount,
+        uint256 _user2Amount
     ) public {
-        user1Amount = (user1Amount % 1000000000) + 1;
-        user2Amount = (user2Amount % 1000000000) + 1;
+        // Bound the fuzz inputs to reasonable values (1 to 1000000000)
+        vm.assume(_user1Amount > 0 && _user1Amount <= 1000000000);
+        vm.assume(_user2Amount > 0 && _user2Amount <= 1000000000);
         // Generate two user addresses
         address user1 = getUser();
         address user2 = getUser();
         // Create a bond between the two users
-        createValidBond(user1, user1Amount, user2, user2Amount);
+        createValidBond(user1, _user1Amount, user2, _user2Amount);
         // Retrieve the bond between the two users
         Bond memory bond = c.bond(user1, user2);
         assertEq(bond.partner, user2);
@@ -246,13 +249,14 @@ contract TestContract is Test {
     }
 
     function testFuzz_BreakABondWithWrongPartner(
-        uint256 user1Amount,
-        uint256 user2Amount,
-        uint256 user3Amount
+        uint256 _user1Amount,
+        uint256 _user2Amount,
+        uint256 _user3Amount
     ) public {
-        user1Amount = (user1Amount % 1000000000) + 1;
-        user2Amount = (user2Amount % 1000000000) + 1;
-        user3Amount = (user3Amount % 1000000000) + 1;
+        // Bound the fuzz inputs to reasonable values (1 to 1000000000)
+        vm.assume(_user1Amount > 0 && _user1Amount <= 1000000000);
+        vm.assume(_user2Amount > 0 && _user2Amount <= 1000000000);
+        vm.assume(_user3Amount > 0 && _user3Amount <= 1000000000);
         // Generate three user addresses
         address user1 = getUser();
         address user2 = getUser();
@@ -260,7 +264,7 @@ contract TestContract is Test {
         // Transfer 100 tokens to user3 as to infer existing balance on user3's account
         token.transfer(user3, 100);
         // Create a bond between user1 and user2
-        createValidBond(user1, 100, user2, 100);
+        createValidBond(user1, _user1Amount, user2, _user2Amount);
         // Retrieve the bond between user1 and user2
         Bond memory bond = c.bond(user1, user2);
         assertEq(bond.partner, user2);
@@ -289,17 +293,18 @@ contract TestContract is Test {
     }
 
     function testFuzz_Withdraw(
-        uint256 user1BondAmount,
-        uint256 user2BondAmount
+        uint256 _user1BondAmount,
+        uint256 _user2BondAmount
     ) public {
-        user1BondAmount = (user1BondAmount % 1000000000) + 1;
-        user2BondAmount = (user2BondAmount % 1000000000) + 1;
+        // Bound the fuzz inputs to reasonable values (1 to 1000000000)
+        vm.assume(_user1BondAmount > 0 && _user1BondAmount <= 1000000000);
+        vm.assume(_user2BondAmount > 0 && _user2BondAmount <= 1000000000);
 
         // Generate two user addresses
         address user1 = getUser();
         address user2 = getUser();
         // Create a bond between the two users
-        createValidBond(user1, user1BondAmount, user2, user2BondAmount);
+        createValidBond(user1, _user1BondAmount, user2, _user2BondAmount);
         // Retrieve the bonds between the users
         Bond memory bond1 = c.bond(user1, user2);
         Bond memory bond2 = c.bond(user2, user1);
