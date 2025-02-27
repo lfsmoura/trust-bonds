@@ -28,7 +28,9 @@ export default function CommunityPool(): JSX.Element {
     const timer = setInterval(() => {
       setDefaultValue(calculateDefaultValue());
       setIsHighlighted(true);
-      setTimeout(() => setIsHighlighted(false), 1000);
+      setTimeout(() => {
+        setIsHighlighted(false);
+      }, 1000);
     }, 3000);
 
     // Initial calculation
