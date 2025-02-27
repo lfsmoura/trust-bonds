@@ -13,18 +13,21 @@ export function SendTransaction() {
   const { sendTransaction } = useSendTransaction();
 
   return (
+
+
+
     <form
       onSubmit={(e) => {
         e.preventDefault();
         if (debouncedTo && debouncedAmount) {
           sendTransaction({
-            to: debouncedTo,
+            to: debouncedTo as `0x${string}`,
             value: parseEther(debouncedAmount)
           });
         }
       }}
     >
-      <div class="flex flex-row gap-x-2">
+      <div className="flex flex-col gap-10">
         <input
           aria-label="address"
           placeholder="0x..."
@@ -40,7 +43,7 @@ export function SendTransaction() {
           value={amount}
         />
       </div>
-      <button type="submit">Send</button>
+      <button className="bg-blue-500pnpm dlx tailwindcss init -p text-white font-bold py-2 px-4 rounded-full" type="submit">Send</button>
     </form>
   )
 }
