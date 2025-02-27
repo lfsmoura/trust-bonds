@@ -14,8 +14,6 @@ export function SendTransaction() {
 
   return (
 
-
-
     <form
       onSubmit={(e) => {
         e.preventDefault();
