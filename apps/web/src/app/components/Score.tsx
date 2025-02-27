@@ -48,7 +48,7 @@ export default function Score({ address }: ScoreProps): JSX.Element {
 
   return (
     <div className="flex flex-col gap-2 items-center">
-      <div className="text-xl font-semibold">Trust Score</div>
+      <h2>Trust Score</h2>
       <svg width="100" height="100" viewBox="0 0 36 36" className="mb-2">
         <path
           d="M18 2.0845

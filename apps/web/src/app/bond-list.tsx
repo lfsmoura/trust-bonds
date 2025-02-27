@@ -34,16 +34,21 @@ export default function BondList({ address }: BondListProps): JSX.Element {
 
   const bonds = data as Bond[];
 
-  // If address is provided, filter bonds for that address
-  // If not, show all bonds or the connected user's bonds
-  const filteredBonds = address
-    ? bonds.filter(
-        (bond) => bond.partner === address || bond.partner === connectedAddress
-      )
-    : bonds;
-
   const formatAddress = (addr: string) =>
     `0x${addr.slice(2, 6)}...${addr.slice(-4)}`;
+
+  const calculateFallbackScore = (addr: string): string => {
+    const lastChar = addr.slice(-1);
+    const numericValue = parseInt(lastChar, 16);
+    return ((numericValue / 15) * 100).toFixed(1);
+  };
+
+  const getScoreColor = (score: string): string => {
+    const value = parseFloat(score);
+    if (value === 100) return "#22c55e";
+    if (value > 50) return "#facc15";
+    return "#ef4444";
+  };
 
   return (
     <div>
@@ -51,24 +56,42 @@ export default function BondList({ address }: BondListProps): JSX.Element {
       <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
         <thead>
           <tr>
-            <th className="py-2 px-4 bg-gray-200 text-left">Partner</th>
-            <th className="py-2 px-4 bg-gray-200 text-left">Amount</th>
+            <th className="py-2 px-4 bg-gray-200 text-left w-1/3">Partner</th>
+            <th className="py-2 px-4 bg-gray-200 text-left w-1/3">Amount</th>
+            <th className="py-2 px-4 bg-gray-200 text-left w-1/3">
+              Partner Trust Score
+            </th>
           </tr>
         </thead>
         <tbody>
-          {filteredBonds.map((bond) => (
-            <tr key={bond.partner} className="border-b">
-              <td className="py-2 px-4">
-                <Link
-                  href={`/profile/${bond.partner}`}
-                  className="text-blue-600 hover:text-blue-800 hover:underline"
-                >
-                  {formatAddress(bond.partner)}
-                </Link>
-              </td>
-              <td className="py-2 px-4">{bond.amount.toString()}</td>
-            </tr>
-          ))}
+          {bonds.map((bond) => {
+            const score = calculateFallbackScore(bond.partner);
+            const scoreColor = getScoreColor(score);
+            return (
+              <tr key={bond.partner} className="border-b">
+                <td className="py-2 px-4 w-1/3">
+                  <Link
+                    href={`/profile/${bond.partner}`}
+                    className="text-blue-600 hover:text-blue-800 hover:underline"
+                  >
+                    {formatAddress(bond.partner)}
+                  </Link>
+                </td>
+                <td className="py-2 px-4 w-1/3">{bond.amount.toString()}</td>
+                <td className="py-2 px-4 w-1/3">
+                  <span
+                    className="px-3 py-1 rounded"
+                    style={{
+                      backgroundColor: `${scoreColor}20`,
+                      color: scoreColor,
+                    }}
+                  >
+                    {score}
+                  </span>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

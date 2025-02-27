@@ -7,8 +7,10 @@ export default function HomeContent() {
         <h2 className="text-3xl font-bold mb-6">Welcome to TrustBonds</h2>
         <p className="text-lg mb-4">
           A public good initiative enabling trust-based financial relationships
-          in Web3, created by Kernel Block 9 participants. Build reputation,
-          earn yields, and participate in community-driven finance.
+          in Web3, created by{" "}
+          <Link href="https://www.kernel.community/">Kernel</Link> participants.
+          Build reputation, earn yields, and participate in community-driven
+          finance.
         </p>
       </section>
 

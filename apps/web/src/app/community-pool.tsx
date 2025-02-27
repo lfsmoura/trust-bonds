@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 export default function CommunityPool(): JSX.Element {
   const [defaultValue, setDefaultValue] = useState(15302);
+  const [isHighlighted, setIsHighlighted] = useState(false);
 
   const { data: balance, isLoading } = useReadContract({
     abi,
@@ -26,6 +27,8 @@ export default function CommunityPool(): JSX.Element {
 
     const timer = setInterval(() => {
       setDefaultValue(calculateDefaultValue());
+      setIsHighlighted(true);
+      setTimeout(() => setIsHighlighted(false), 1000);
     }, 3000);
 
     // Initial calculation
@@ -45,12 +48,18 @@ export default function CommunityPool(): JSX.Element {
       <h2 className="text-3xl font-bold mb-6">Community Pool</h2>
       <p className="text-xl">
         $
-        {balance
-          ? formatEther(balance as bigint)
-          : defaultValue.toLocaleString("en-US", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}{" "}
+        <span
+          className={`transition-colors duration-1000 ${
+            isHighlighted ? "bg-yellow-200" : "bg-transparent"
+          }`}
+        >
+          {balance
+            ? formatEther(balance as bigint)
+            : defaultValue.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+        </span>{" "}
         USDC Locked by the community
       </p>
     </div>
