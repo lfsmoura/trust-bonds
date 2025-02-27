@@ -32,7 +32,7 @@ export default function BondList({ address }: BondListProps): JSX.Element {
     return <div>Loading...</div>;
   }
 
-  const bonds = (data as Bond[]) || [];
+  const bonds = data as Bond[];
 
   // If address is provided, filter bonds for that address
   // If not, show all bonds or the connected user's bonds

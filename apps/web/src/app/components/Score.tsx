@@ -34,12 +34,16 @@ export default function Score({ address }: ScoreProps): JSX.Element {
 
   const displayScore =
     score?.toString() === "0"
-      ? calculateFallbackScore(address || connectedAddress)
+      ? calculateFallbackScore(address || connectedAddress || "")
       : score?.toString() || "4.3";
 
   const scoreValue = parseFloat(displayScore);
-  const strokeColor =
-    scoreValue === 100 ? "#22c55e" : scoreValue > 50 ? "#facc15" : "#ef4444";
+  const getStrokeColor = (value: number) => {
+    if (value === 100) return "#22c55e";
+    if (value > 50) return "#facc15";
+    return "#ef4444";
+  };
+  const strokeColor = getStrokeColor(scoreValue);
   const strokeDasharray = `${scoreValue}, 100`;
 
   return (

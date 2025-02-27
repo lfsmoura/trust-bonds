@@ -31,7 +31,9 @@ export default function CommunityPool(): JSX.Element {
     // Initial calculation
     setDefaultValue(calculateDefaultValue());
 
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+    };
   }, []);
 
   if (isLoading) {
