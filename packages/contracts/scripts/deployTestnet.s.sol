@@ -17,18 +17,19 @@ contract DeployTestnet is Script {
         address tokenAddress = vm.envAddress("TESTNET_TOKEN"); 
         address poolAddress = vm.envAddress("TESTNET_POOL");
         address trustBondOwner = vm.envAddress("TESTNET_OWNER");
-
+        address atokenAddress = vm.envAddress("TESTNET_ATOKEN");
         // Use provided addresses for dependencies
         IGitcoinPassportDecoder passportDecoder = IGitcoinPassportDecoder(passportDecoderAddress);
         IERC20 token = IERC20(tokenAddress);
         IPool pool = IPool(poolAddress);
-
+        IERC20 atoken = IERC20(atokenAddress);
         // Deploy TrustBond contract
         TrustBond trustBond = new TrustBond(
             trustBondOwner,
             passportDecoder,
             pool,
-            token
+            token,
+            atoken
         );
 
         console.log("TrustBond deployed at:", address(trustBond));

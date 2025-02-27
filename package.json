@@ -20,5 +20,8 @@
   "engines": {
     "node": ">=18"
   },
-  "name": "trust-bonds"
+  "name": "trust-bonds",
+  "dependencies": {
+    "@dotenvx/dotenvx": "^1.38.3"
+  }
 }
