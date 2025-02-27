@@ -4,11 +4,11 @@ import { useDebounce } from "use-debounce";
 import { useWriteContract, useSimulateContract } from "wagmi";
 import { parseUnits } from "viem";
 
-// Keep your testnet USDC address
-const USDC_CONTRACT_ADDRESS = "0x2C9678042D52B97D27f2bD2947F7111d93F3dD0D"; //"0xa6741c6c3e4542742dadc95808919141c27980ee";
+// USDC contract approval address
+const USDC_CONTRACT_ADDRESS = "0x2C9678042D52B97D27f2bD2947F7111d93F3dD0D"; //Currently using TrustBonds contract address for approval
 
 // TrustBond contract address
-const TRUST_BOND_CONTRACT_ADDRESS = "0x2C9678042D52B97D27f2bD2947F7111d93F3dD0D"; //"0x9fCea767C9C6E9439a2E7DE129961aC6A98b94D2"; // Replace with your deployed contract address
+const TRUST_BOND_CONTRACT_ADDRESS = "0x2C9678042D52B97D27f2bD2947F7111d93F3dD0D"; //TrustBonds contract address for token spending
 
 // ERC20 approve function ABI
 const ERC20_ABI = [
