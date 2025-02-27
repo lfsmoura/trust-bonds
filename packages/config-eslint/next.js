@@ -44,5 +44,8 @@ module.exports = {
   rules: {
     "import/no-default-export": "off",
     "unicorn/filename-case": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "react/jsx-no-leaked-render": "off",
+    "@typescript-eslint/no-confusing-void-expression": "off",
   },
 };

@@ -25,7 +25,7 @@ contract Test is Script {
 
         token.approve(address(trustBond), 100);
 
-        address partner = 0x0000000000000000000000000000000000000000;
+        address partner = 0xf31772485cFB5d75a8F056f04B32D89eAf0d83De;
         uint256 amount = 100;
         trustBond.deposit(amount, partner);
 

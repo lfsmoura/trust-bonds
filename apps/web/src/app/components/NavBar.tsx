@@ -9,27 +9,30 @@ export default function NavBar() {
   const { isConnected } = useAccount();
 
   return (
-    <nav className="w-full flex justify-between items-center p-4">
-      <Link href="/" className="text-4xl font-bold flex items-center">
+    <nav className="w-full flex flex-col md:flex-row justify-between items-center p-4 gap-4">
+      <Link
+        href="/"
+        className="text-2xl md:text-4xl font-bold flex items-center"
+      >
         <ChainIcon />
         TrustBonds
-        <span className="ml-4 text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full font-normal">
+        <span className="ml-2 md:ml-4 text-[10px] md:text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full font-normal">
           powered by Scroll
         </span>
       </Link>
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col md:flex-row items-center gap-4">
         <ConnectButton />
         {isConnected && (
-          <>
+          <div className="flex flex-col md:flex-row items-center gap-4">
             <Link
               href="/profile"
-              className="px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="w-full md:w-auto px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-center"
             >
               My Profile
             </Link>
             <Link
               href="/create"
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-colors"
+              className="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-colors"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -47,7 +50,7 @@ export default function NavBar() {
               </svg>
               Create
             </Link>
-          </>
+          </div>
         )}
       </div>
     </nav>

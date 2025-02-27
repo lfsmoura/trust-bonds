@@ -17,14 +17,16 @@ interface BondListProps {
 export default function BondList({ address }: BondListProps): JSX.Element {
   const { isConnected, address: connectedAddress } = useWallet();
 
+  const addressUsed = address || connectedAddress;
+
   const { data, isLoading } = useReadContract({
     abi,
     address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`,
     functionName: "bonds",
-    args: [address || connectedAddress],
+    args: [addressUsed],
   });
 
-  if (!isConnected) {
+  if (!isConnected && !address) {
     return <div>Connect your wallet to see your bonds</div>;
   }
 
@@ -61,6 +63,9 @@ export default function BondList({ address }: BondListProps): JSX.Element {
             <th className="py-2 px-4 bg-gray-200 text-left w-1/3">
               Partner Trust Score
             </th>
+            <th className="py-2 px-4 bg-gray-200 text-left w-1/3">
+              Bond Status
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -89,6 +94,9 @@ export default function BondList({ address }: BondListProps): JSX.Element {
                     {score}
                   </span>
                 </td>
+                <td className="py-2 px-4 w-1/3">
+                  <Status user1={bond.partner} user2={addressUsed || ""} />
+                </td>
               </tr>
             );
           })}
@@ -96,4 +104,18 @@ export default function BondList({ address }: BondListProps): JSX.Element {
       </table>
     </div>
   );
+}
+
+function Status({ user1, user2 }: { user1: string; user2: string }) {
+  const { data, isLoading } = useReadContract({
+    abi,
+    address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`,
+    functionName: "bond",
+    args: [user1, user2],
+  }) as { data: { amount: bigint } | undefined; isLoading: boolean };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  return <div>{data?.amount.toString() === "0" ? "Pending" : "Active"}</div>;
 }
