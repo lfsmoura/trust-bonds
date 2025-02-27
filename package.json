@@ -12,9 +12,10 @@
     "snapshot-check": "turbo snapshot-check"
   },
   "devDependencies": {
-    "prettier": "^3.2.5",
-    "prettier-plugin-tailwindcss": "^0.5.11",
-    "turbo": "^2.1.1"
+    "prettier": "^3.5.2",
+    "prettier-plugin-tailwindcss": "^0.5.14",
+    "turbo": "^2.4.4",
+    "typescript": "^5.7.3"
   },
   "packageManager": "pnpm@8.15.6",
   "engines": {
@@ -22,6 +23,8 @@
   },
   "name": "trust-bonds",
   "dependencies": {
-    "@dotenvx/dotenvx": "^1.38.3"
+    "@dotenvx/dotenvx": "^1.38.3",
+    "use-debounce": "^10.0.4",
+    "wagmi": "^2.14.11"
   }
 }
