@@ -1,0 +1,6 @@
+[book]
+authors = ["Leonardo Moura et al."]
+language = "en"
+multilingual = false
+src = "src"
+title = "TrustBonds Docs"
