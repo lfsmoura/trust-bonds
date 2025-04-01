@@ -1,5 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalEnv": ["NEXT_PUBLIC_CONTRACT_ADDRESS"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

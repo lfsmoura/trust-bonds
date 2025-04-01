@@ -10,8 +10,10 @@
     "lint": "forge fmt && forge check",
     "snapshot-check": "forge snapshot --check --tolerance 10",
     "snapshot": "forge snapshot",
-    "deploy-testnet": "forge script scripts/deployTestnet.s.sol:DeployTestnet --rpc-url $RPC_URL --broadcast --verify --etherscan-api-key $ETHERSCAN_API_KEY --verifier-url $VERIFIER_URL",
-    "clean": "rm -rf out"
+    "deploy-testnet": "dotenvx run -f ../../.env.local -- forge script scripts/deployTestnet.s.sol:DeployTestnet --rpc-url $RPC_URL --broadcast --verify --verifier-url $VERIFIER_URL ",
+    "balance": "cast call $CONTRACT_ADDRESS 'communityPoolBalance' --rpc-url $RPC_URL --etherscan-api-key $ETHERSCAN_API_KEY",
+    "clean": "rm -rf out",
+    "script": "forge script -vvvvv scripts/test.s.sol:Test --rpc-url $RPC_URL --etherscan-api-key $ETHERSCAN_API_KEY --broadcast --verify --verifier-url $VERIFIER_URL "
   },
   "keywords": [],
   "author": "",

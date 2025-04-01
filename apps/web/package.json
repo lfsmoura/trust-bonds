@@ -3,17 +3,22 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "dotenvx run -f ../../.env.local -- next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@rainbow-me/rainbowkit": "^2.2.4",
     "@repo/ui": "workspace:*",
+    "@tanstack/react-query": "^5.55.3",
     "next": "^14.2.3",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "use-debounce": "^10.0.4",
+    "viem": "2.23.3",
+    "wagmi": "^2.14.11"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^14.2.3",
