@@ -339,6 +339,62 @@ contract TestContract is Test {
         );
     }
 
+    function testFuzz_WithdrawAndBond(
+        uint256 _user1BondAmount,
+        uint256 _user2BondAmount
+    ) public {
+        // Bound the fuzz inputs to reasonable values (1 to 1000000000)
+        vm.assume(_user1BondAmount > 0 && _user1BondAmount <= 1000000000);
+        vm.assume(_user2BondAmount > 0 && _user2BondAmount <= 1000000000);
+
+        // Generate two user addresses
+        address user1 = getUser();
+        address user2 = getUser();
+        // Create a bond between the two users
+        createValidBond(user1, _user1BondAmount, user2, _user2BondAmount);
+        // Retrieve the bonds between the users
+        Bond memory bond1 = c.bond(user1, user2);
+        Bond memory bond2 = c.bond(user2, user1);
+        // Assert the existence of the bonds
+        assertEq(bond1.partner, user2);
+        assertEq(bond2.partner, user1);
+        // Retrieve contract fee
+        uint256 fee = c.withdrawalFee();
+        // Retrieve the balance for message sender (user1) before withdrawing
+        uint256 amount1 = bond1.amount;
+        // Retrieve the balance for partner (user2) before withdrawing
+        uint256 amount2 = bond2.amount;
+        // Retrieve contract funds
+        uint256 contractBalanceBeforeWithdraw = atoken.balanceOf(address(c));
+        // Simulate the first user making the call
+        vm.prank(user1);
+        // Withdraw
+        c.withdraw(user2);
+        // Retrieve the balance of User1 after withdrawing
+        uint256 user1BalanceAfterWithdraw = token.balanceOf(user1);
+        assertEq(user1BalanceAfterWithdraw, (amount1 - (amount1 * fee) / 100));
+        // Retrieve the balance of User2 after withdrawing
+        uint256 user2BalanceAfterWithdraw = token.balanceOf(user2);
+        assertEq(user2BalanceAfterWithdraw, (amount2 - (amount2 * fee) / 100));
+        // Retrieve the contract balance after withdrawing
+        uint256 contractBalanceAfterWithdraw = atoken.balanceOf(address(c));
+
+        // Check for the retained fees after withdrawing
+        assertEq(
+            ((bond1.amount + bond2.amount) + contractBalanceAfterWithdraw),
+            contractBalanceBeforeWithdraw
+        );
+
+        // Check if users can bond again
+        createValidBond(user1, _user1BondAmount, user2, _user2BondAmount);
+        // Retrieve the bonds between the users
+        Bond memory bond3 = c.bond(user1, user2);
+        Bond memory bond4 = c.bond(user2, user1);
+        // Assert the existence of the bonds
+        assertEq(bond3.partner, user2);
+        assertEq(bond4.partner, user1);
+    }
+
     function testFuzz_Deposit(uint256 _amount) public {
         // Bound the fuzz input to reasonable values (1 to 1000000000)
         vm.assume(_amount > 0 && _amount <= 1000000000);
