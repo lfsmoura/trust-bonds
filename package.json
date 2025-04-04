@@ -9,7 +9,8 @@
     "clean": "turbo clean",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "snapshot": "turbo snapshot",
-    "snapshot-check": "turbo snapshot-check"
+    "snapshot-check": "turbo snapshot-check",
+    "dev:docs": "mdbook serve docs"
   },
   "devDependencies": {
     "prettier": "^3.2.5",
@@ -22,6 +23,6 @@
   },
   "name": "trust-bonds",
   "dependencies": {
-    "@dotenvx/dotenvx": "^1.38.3"
+    "@dotenvx/dotenvx": "^1.39.0"
   }
 }
